@@ -1,0 +1,61 @@
+#header{
+	border-bottom-style: solid;
+	margin: 5px;
+	padding: 5px;
+}
+
+#accordion{
+	height:85%;
+	width:100%;
+	padding: 0px;
+	margin: 0px;
+}
+
+#menu{
+	float:left;
+	width:30%;
+	padding: 0px;
+	margin: 0px;
+}
+
+#songs{
+	padding: 0px;
+	margin: 0px;
+}
+
+#songs_table{
+	float:right;
+	height:90%;
+	overflow:auto;
+	width:70%;
+	padding: 0px;
+	margin: 0px;
+}
+
+.search-input{
+	width:166px;
+}
+
+.header{
+	color:black;
+	background:#A7A7A7;
+}
+
+.normalrow{
+	color:black;
+	border:1px solid;
+	background:#99ccff;
+}
+
+.alternaterow{
+	color:black;
+	background:#A7A7A7;
+}
+
+.scrollContent{
+	overflow: auto;
+}
+
+.tableContainer a{
+	color:black;	
+}
