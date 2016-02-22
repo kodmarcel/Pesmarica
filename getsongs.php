@@ -66,9 +66,16 @@ if($_POST["action"]=='getsongs'){
 		mysqli_close($con);
 }
 elseif ($_POST["action"]=='generate'){
+	rename("uploads/".$_POST["frontpage"], "songbooks/frontpages/".$_POST["frontpage"]);
 	$con = dbconnect();
 	date_default_timezone_set('Europe/Ljubljana');
 	$title=date("Y_m_d-H_i_s");
+	if(isset($_SESSION["uid"])) {
+		$uid=$_SESSION["uid"];
+	}
+	else{
+		$uid=-1;
+	}		
 	$header = file_get_contents('tex/header.tex');
 	file_put_contents("songbooks/".$title.".tex", $header, FILE_APPEND | LOCK_EX);
 	$chords = file_get_contents('tex/chords.tex');
@@ -91,8 +98,12 @@ elseif ($_POST["action"]=='generate'){
 	$footer = file_get_contents('tex/footer.tex');
 	file_put_contents("songbooks/".$title.".tex", $footer, FILE_APPEND | LOCK_EX); 
 	shell_exec("sh ".$config['site_root']."/generate.sh ".$config['site_root']."/songbooks ".$title);
+	$query = "INSERT INTO `songbooks`(`title`, `songs`, `frontpage`, `uid`) VALUES ('".$title."','".implode(" ",$_POST["songs"])."','".$_POST["frontpage"]."',".$uid.")";
+	mysqli_query($con,$query);
+	mysqli_commit($con);
 	mysqli_close($con);
 	echo "songbooks/".$title.".pdf";
+	echo "\n".$query;
 }
 elseif ($_POST["action"]=='getEdit'){
 	$con = dbconnect();

@@ -18,6 +18,20 @@
 	margin: 0px;
 }
 
+#gallery{
+
+	display: block;
+    	overflow-x: auto;
+    	overflow-y: hidden;
+    	white-space: nowrap;
+}
+
+.galleryItem{
+    position: relative;
+    display: inline-block;
+    padding: 5px;
+}
+
 #songs{
 	padding: 0px;
 	margin: 0px;

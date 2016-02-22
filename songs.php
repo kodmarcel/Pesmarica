@@ -7,6 +7,7 @@ session_start();
 ?>
 
 <script>
+var frontpageTitle = "default";
 $(document).ready(function() {
 	refreshsongs();
 	})
@@ -21,6 +22,46 @@ $(document).ready(function() {
 		});;		
 		//e.preventDefault();
 	};
+	
+	//************************** Image uploader *******************
+	$(document).on('click', '#uploadFrontpage', function()  {
+		$("#DlDialog").attr('title', 'Nalagam...');
+		var string ='<div id="progressbar"></div><p>Nalagam naslovnico...</p>';
+		$("#DlDialog").empty().append(string);
+		$( "#progressbar" ).progressbar({
+  			value: false
+		});
+		$( "#DlDialog" ).dialog({autoOpen: true, modal: true});
+    		var file_data = $("#fileToUpload").prop("files")[0];   
+		var form_data = new FormData();                  
+		form_data.append("file", file_data);
+		//alert(form_data);                             
+		//$.post( "upload.php", {form_data}, 
+		//			function(data){
+		//	alert(data);
+		//});;
+		$.ajax({
+                	url: 'upload.php', // point to server-side PHP script 
+	                dataType: 'text',  // what to expect back from the PHP script, if anything
+	                cache: false,
+	                contentType: false,
+	                processData: false,
+	                data: form_data,                         
+	                type: 'post',
+	                success: function(php_script_response){
+	                    if (php_script_response.substring(0, 2)=="OK"){
+				$( "#DlDialog" ).dialog( "close" );
+				frontpageTitle = php_script_response.substring(3, php_script_response.length-2);
+				$("#gallery").prepend('<div class="galleryItem"><img src="uploads/'+frontpageTitle+'" alt="'+frontpageTitle+'" style="height:350px;"></div>');
+	                    }
+	                    else{
+	                    	var string = "<h2>PUJS!</h2><br>"+php_script_response+"";
+				$("#DlDialog").empty().append(string);
+				setTimeout(function(){$( "#DlDialog" ).dialog( "close" )}, 3000);
+	                    }
+	                }
+		});
+	});
 
 
 $(document).on('click', '.SortBy', function()  {
@@ -36,6 +77,7 @@ if(isset($_SESSION["user"])){
 echo "Dobrodošel, ".$_SESSION["user"]."! <a href='index.php?p=logout' title='Klikni tukaj za odjavo.'>Odjava</a>";}
 if(!isset($_SESSION["user"])){include "login.php";}
 ?>
+<span id="fpname">
 </div>
 <div id="accordion">
 <h3 title="Izbor pesmi">1. Pesmi</h3>
@@ -134,19 +176,35 @@ if(!isset($_SESSION["user"])){include "login.php";}
 		</div>
 </div>
 <h3 title="Nalaganje naslovnice ter izbira nekaterih slogovnih nastavitev">2. Naslovnica in oblika</h3>
-<div> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum faucibus ipsum id consequat volutpat. Nulla suscipit orci a hendrerit commodo. Donec rutrum leo ac metus convallis, in accumsan lectus venenatis. Phasellus sed neque tellus. Quisque dignissim nec urna vitae convallis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vitae lorem vel turpis efficitur faucibus in vitae massa. Vivamus quis mauris consequat, posuere libero non, tristique felis. Praesent efficitur ornare est hendrerit faucibus. Morbi venenatis mi massa. Maecenas porttitor lacus id lectus cursus dignissim. Praesent vel lobortis lacus, nec dignissim sapien. Aenean efficitur massa ut libero auctor feugiat. In quis eros vitae magna condimentum varius.
+<div> 
+	<div id="gallery">
+		<?php
+			$con = dbconnect();
+			$query = "SELECT * FROM `songbooks` ORDER BY `id` DESC";
+			$result =  mysqli_query($con,$query);
+			while($row = mysqli_fetch_array($result,MYSQLI_ASSOC)) {
+				echo'<div class="galleryItem" title="'.$row["title"].' by '.$row["uid"].'"><img src="songbooks/frontpages/'.$row["frontpage"].'" alt="'.$row["frontpage"].'" style="height:350px;"></div>';
+			}
+		?>
+	</div>
+	<div id="uploadForm">
+		Select image to upload:
+		<input type="file" name="fileToUpload" id="fileToUpload">
+		<input type="submit" value="Upload Image" id="uploadFrontpage">
+	</div>
+	<div>	<generate title="Generiranje in prenos pesmarice.">Napravi mi pesmarico!</generate></div>
+</div>
 
-Nam lacinia purus ut rhoncus rhoncus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Suspendisse scelerisque venenatis maximus. Curabitur et sollicitudin ex. Donec nec sodales metus. Ut vitae lobortis nisl. Nunc sollicitudin consectetur tellus, eget egestas risus mollis commodo. Proin sed posuere enim, id placerat magna. Pellentesque vitae risus urna. Sed ac elit ante. Proin et risus non nunc mollis accumsan non ut mi. Phasellus sem dui, commodo non tristique sit amet, convallis quis magna. Pellentesque finibus hendrerit tortor in lobortis. Pellentesque aliquam luctus ante, ut fringilla nulla pretium vel. Quisque sagittis egestas nulla, et scelerisque felis rutrum ac. In quis sem ut velit laoreet maximus sit amet ac massa. </div>
 
-<h3 title="Pregled, generiranje in prenos pesmarice.">3. Prenos</h3>
-<div>	<generate title="Generiranje in prenos pesmarice.">Napravi mi pesmarico!</generate></div>
+
+
 
 </div>
 <div id="DlDialog" title="Generiram...">
 
 </div>
 <script>
-$( document ).tooltip();
+//$( document ).tooltip();
 $( "#accordion" ).accordion();
 $( "SelAllVisible" ).button();
 $( "UnselAllVisible" ).button();
@@ -166,13 +224,14 @@ $( "generate" ).click(function(){
             names.push(this.value);
         });
 	//alert(names);
+	$("#DlDialog").attr('title', 'Generiram...');
 	var string ='<div id="progressbar"></div><p>Pripravljam pesmarico...</p>';
 	$("#DlDialog").empty().append(string);
 	$( "#progressbar" ).progressbar({
   		value: false
 	});
 	$( "#DlDialog" ).dialog({autoOpen: true, modal: true});
-	$.post( "getsongs.php", {action: "generate", songs: names}, 
+	$.post( "getsongs.php", {action: "generate", songs: names, frontpage: frontpageTitle}, 
 		function(data){
 			//window.location.href = data;
 			//alert(data);
