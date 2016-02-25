@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Feb 20, 2016 at 12:42 AM
+-- Generation Time: Feb 25, 2016 at 10:35 PM
 -- Server version: 10.0.11-MariaDB
 -- PHP Version: 5.6.17
 
@@ -33,6 +33,32 @@ CREATE TABLE IF NOT EXISTS `cookies` (
   `uid` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `songbooks`
+--
+
+CREATE TABLE IF NOT EXISTS `songbooks` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` text COLLATE utf8_slovenian_ci NOT NULL,
+  `songs` text COLLATE utf8_slovenian_ci NOT NULL,
+  `frontpage` text COLLATE utf8_slovenian_ci NOT NULL,
+  `uid` int(11) NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `songbookPublic` int(11) NOT NULL DEFAULT '0',
+  `frontpagePublic` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_slovenian_ci AUTO_INCREMENT=9 ;
+
+--
+-- Dumping data for table `songbooks`
+--
+
+INSERT INTO `songbooks` (`id`, `title`, `songs`, `frontpage`, `uid`, `timestamp`, `songbookPublic`, `frontpagePublic`) VALUES
+(2, '2016_02_22-05_36_44', '1 2 3 4\n 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 27 28 29 30 26 31 32 33 34 35 36 37 38 39\n 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 63 62 64 65 66 67 69 68 70 71 72 73\n 74 75 76 77 78 79 80 81 82 158 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104\n 105 106 107 108 109 110 111 112 113 114 115 116 118 117 119 120 121 122 123 124 125 126 127 128 129\n 130 131 132 133 134 135 136 137 138 148 139 140 141 142 143 144 145 146 147 149 150 151 152 153 154\n 155 156 157', '2014.png', 2, '2016-02-22 04:37:31', 1, 1),
+(3, '2016_02_22-05_46_57', '1 2 3 4\r\n 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 27 28 29 30 26 31 32 33 34 35 36 37 38 39\r\n 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 63 62 64 65 66 67 69 68 70 71 72 73\r\n 74 75 76 77 78 79 80 81 82 158 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104\r\n 105 106 107 108 109 110 111 112 113 114 115 116 118 117 119 120 121 122 123 124 125 126 127 128 129\r\n 130 131 132 133 134 135 136 137 138 148 139 140 141 142 143 144 145 146 147 149 150 151 152 153 154\r\n 155 156 157', '2015.png', 2, '2016-02-22 04:48:58', 1, 1);
 
 -- --------------------------------------------------------
 

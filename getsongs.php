@@ -76,7 +76,10 @@ elseif ($_POST["action"]=='generate'){
 	else{
 		$uid=-1;
 	}		
-	$header = file_get_contents('tex/header.tex');
+	$header = file_get_contents('tex/header1.tex');
+	file_put_contents("songbooks/".$title.".tex", $header, FILE_APPEND | LOCK_EX);
+	file_put_contents("songbooks/".$title.".tex", "{frontpages/".$_POST["frontpage"]."}", FILE_APPEND | LOCK_EX);
+	$header = file_get_contents('tex/header2.tex');
 	file_put_contents("songbooks/".$title.".tex", $header, FILE_APPEND | LOCK_EX);
 	$chords = file_get_contents('tex/chords.tex');
 	file_put_contents("songbooks/".$title.".tex", $chords, FILE_APPEND | LOCK_EX);
@@ -98,7 +101,7 @@ elseif ($_POST["action"]=='generate'){
 	$footer = file_get_contents('tex/footer.tex');
 	file_put_contents("songbooks/".$title.".tex", $footer, FILE_APPEND | LOCK_EX); 
 	shell_exec("sh ".$config['site_root']."/generate.sh ".$config['site_root']."/songbooks ".$title);
-	$query = "INSERT INTO `songbooks`(`title`, `songs`, `frontpage`, `uid`) VALUES ('".$title."','".implode(" ",$_POST["songs"])."','".$_POST["frontpage"]."',".$uid.")";
+	$query = "INSERT INTO `songbooks`(`title`, `songs`, `frontpage`, `uid`, `songbookPublic`, `frontpagePublic`) VALUES ('".$title."','".implode(" ",$_POST["songs"])."','".$_POST["frontpage"]."',".$uid.",".$_POST["sonPub"].",".$_POST["fronPub"].")";
 	mysqli_query($con,$query);
 	mysqli_commit($con);
 	mysqli_close($con);

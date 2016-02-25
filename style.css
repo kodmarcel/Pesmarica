@@ -27,9 +27,17 @@
 }
 
 .galleryItem{
-    position: relative;
-    display: inline-block;
-    padding: 5px;
+	border-style: none;
+	border-width: 5px;
+	border-color: blue;
+	position: relative;
+	display: inline-block;
+	margin: 5px;
+	padding: 5px;
+}
+
+.galleryItem p{
+	text-align:center;	
 }
 
 #songs{

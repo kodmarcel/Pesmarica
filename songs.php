@@ -10,6 +10,8 @@ session_start();
 var frontpageTitle = "default";
 $(document).ready(function() {
 	refreshsongs();
+	$(".galleryItem").css("margin","5px");
+	$(".galleryItem[title='default by admin']").css({"border-style":"solid", "margin":"0px"});
 	})
 	
 	//*************************** REFRESHERS ************************
@@ -24,7 +26,7 @@ $(document).ready(function() {
 	};
 	
 	//************************** Image uploader *******************
-	$(document).on('click', '#uploadFrontpage', function()  {
+	$(document).on('change', '#fileToUpload', function()  {
 		$("#DlDialog").attr('title', 'Nalagam...');
 		var string ='<div id="progressbar"></div><p>Nalagam naslovnico...</p>';
 		$("#DlDialog").empty().append(string);
@@ -52,7 +54,9 @@ $(document).ready(function() {
 	                    if (php_script_response.substring(0, 2)=="OK"){
 				$( "#DlDialog" ).dialog( "close" );
 				frontpageTitle = php_script_response.substring(3, php_script_response.length-2);
-				$("#gallery").prepend('<div class="galleryItem"><img src="uploads/'+frontpageTitle+'" alt="'+frontpageTitle+'" style="height:350px;"></div>');
+				$("#gallery").prepend('<div class="galleryItem" title="'+frontpageTitle+' by me"><img src="uploads/'+frontpageTitle+'" alt="'+frontpageTitle+'" style="height:350px;"><p><i>'+frontpageTitle+'</i> by me</p></div>');
+				$(".galleryItem").css({"border-style":"none", "margin":"5px"});
+				$(".galleryItem[title='"+frontpageTitle+" by me']").css({"border-style":"solid", "margin":"0px"});
 	                    }
 	                    else{
 	                    	var string = "<h2>PUJS!</h2><br>"+php_script_response+"";
@@ -62,7 +66,16 @@ $(document).ready(function() {
 	                }
 		});
 	});
-
+	
+	//************************************ Frontpage selector *****************************************
+	$(document).on('click', '.galleryItem', function()  {
+		$(this).css({"border-style":"solid", "margin":"0px"});
+		frontpageTitle=$(this).children().attr("alt");
+		//alert(frontpageTitle);
+		$(".galleryItem").not(this).each(function(){
+			$(this).css({"border-style":"none", "margin":"5px"});
+		});
+	});
 
 $(document).on('click', '.SortBy', function()  {
 	var column = $(this).attr('id');
@@ -178,20 +191,26 @@ if(!isset($_SESSION["user"])){include "login.php";}
 <h3 title="Nalaganje naslovnice ter izbira nekaterih slogovnih nastavitev">2. Naslovnica in oblika</h3>
 <div> 
 	<div id="gallery">
+		<div class="galleryItem" title="default by admin"><img src="songbooks/frontpages/default.png" alt="default.png" style="height:350px;"><p><i>default</i> by admin</p></div>
 		<?php
 			$con = dbconnect();
-			$query = "SELECT * FROM `songbooks` ORDER BY `id` DESC";
+			$query = "SELECT * FROM `songbooks` WHERE `frontpagePublic`=1 ORDER BY `id` DESC";
 			$result =  mysqli_query($con,$query);
 			while($row = mysqli_fetch_array($result,MYSQLI_ASSOC)) {
-				echo'<div class="galleryItem" title="'.$row["title"].' by '.$row["uid"].'"><img src="songbooks/frontpages/'.$row["frontpage"].'" alt="'.$row["frontpage"].'" style="height:350px;"></div>';
+				$query="SELECT `user` FROM `users` WHERE `id`=".$row["uid"];
+				$userrr =  mysqli_fetch_array(mysqli_query($con,$query),MYSQLI_ASSOC);
+				if ($row["uid"]==-1){$userrr["user"]='Anonymous';}
+				echo'<div class="galleryItem" title="'.$row["title"].' by '.$userrr["user"].'"><img src="songbooks/frontpages/'.$row["frontpage"].'" alt="'.$row["frontpage"].'" style="height:350px;"><p><i>'.$row["frontpage"].'</i> by '.$userrr["user"].'</p></div>';
 			}
 		?>
 	</div>
 	<div id="uploadForm">
 		Select image to upload:
 		<input type="file" name="fileToUpload" id="fileToUpload">
-		<input type="submit" value="Upload Image" id="uploadFrontpage">
+		<p>Javna objava naslovnice: <input type="checkbox" id="frontpagePublic" checked="1">&nbsp
+		Javna objava pesmarice: <input type="checkbox" id="songbookPublic" checked="1">
 	</div>
+	<br>
 	<div>	<generate title="Generiranje in prenos pesmarice.">Napravi mi pesmarico!</generate></div>
 </div>
 
@@ -217,12 +236,17 @@ $( "UnselAllVisible" ).click(function(){
 });
 
 $( "generate" ).click(function(){
+	//alert((0+$("#songbookPublic").prop('checked'))+" && "+(0+$("#frontpagePublic").prop('checked')));
 	var selected = [];
 	//$('tr[style="display: table-row;"]').children(".selector").children(".CheckedSongId").children("input:checked").map(function() {
 	var names = [];
         $('#songs_table input:checked').each(function() {
             names.push(this.value);
         });
+        if (names==""){$("#DlDialog").attr('title', 'Generiram...');
+	var string ='<p>Izbrana ni nobena pesem.</p>';
+	$("#DlDialog").empty().append(string);}
+        else{
 	//alert(names);
 	$("#DlDialog").attr('title', 'Generiram...');
 	var string ='<div id="progressbar"></div><p>Pripravljam pesmarico...</p>';
@@ -231,13 +255,14 @@ $( "generate" ).click(function(){
   		value: false
 	});
 	$( "#DlDialog" ).dialog({autoOpen: true, modal: true});
-	$.post( "getsongs.php", {action: "generate", songs: names, frontpage: frontpageTitle}, 
+	$.post( "getsongs.php", {action: "generate", songs: names, frontpage: frontpageTitle, sonPub: (0+$("#songbookPublic").prop('checked')), fronPub: (0+$("#frontpagePublic").prop('checked'))}, 
 		function(data){
 			//window.location.href = data;
 			//alert(data);
 			var string = "<h2>Tvoja pesmarica je pripravljena! <a href="+data+" id='DlDialogCloser'>Prenos</a></h2>";
 			$("#DlDialog").empty().append(string);
 		});
+	}
 });
 
 $(document).on('click', '#DlDialogCloser', function()  {
